@@ -1,4 +1,5 @@
-﻿using GameStore.Api.Data;
+﻿using System.Security.Claims;
+using GameStore.Api.Data;
 using GameStore.Api.Features.Games.Constants;
 using GameStore.Api.Models;
 using GameStore.Api.Shared.FileUpload;
@@ -14,8 +15,11 @@ public static class CreateGameEndpoint
     {
         return app.MapPost("/",
                 async ([FromForm] CreateGameDto createGameDto, GameStoreContext dbContext, ILogger<Program> logger,
-                    FileUploader fileUploader) =>
+                    FileUploader fileUploader, ClaimsPrincipal user) =>
                 {
+                    if (user.Identity?.IsAuthenticated == false)
+                        return Results.Unauthorized();
+
                     var imageUri = DefaultImageUri;
 
                     if (createGameDto.ImageFile is not null)

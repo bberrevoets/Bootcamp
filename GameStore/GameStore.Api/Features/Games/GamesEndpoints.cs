@@ -10,8 +10,7 @@ public static class GamesEndpoints
 {
     public static void MapGames(this IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("/games")
-            .WithTags("Games");
+        var group = app.MapGroup("/games");
 
         group.MapGetGames();
         group.MapGetGame();

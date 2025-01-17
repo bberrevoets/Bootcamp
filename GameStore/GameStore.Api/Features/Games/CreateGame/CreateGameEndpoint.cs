@@ -59,7 +59,6 @@ public static class CreateGameEndpoint
                             game.Description, game.ImageUri, game.LastUpdatedBy));
                 })
             .WithParameterValidation()
-            .WithName(EndpointNames.CreateGame)
             .DisableAntiforgery();
     }
 }

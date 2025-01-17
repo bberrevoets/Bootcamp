@@ -1,0 +1,34 @@
+GET http://localhost:5082/games?pageNumber=1&pageSize=3&name=street
+
+###
+GET http://localhost:5082/games/be3decbd-0592-4fb4-ae9c-90f531a4b1fd
+
+###
+POST http://localhost:5082/games
+Content-Type: application/json
+
+{
+  "name": "Elden Ring",
+  "genreId": "62998639-ff87-4399-85d1-942bfde92e02",
+  "price": 49.99,
+  "releaseDate": "2022-02-25",
+  "description": "Survive the night or create a work of art in the hit sandbox game! Build anything you can imagine, uncover mysteries, and face thrilling foes in an infinite world that's unique in every playthrough. There's no wrong way to play!"
+}
+
+###
+PUT http://localhost:5082/games/01933c47-ce1f-7958-8a32-75cc74414e60
+Content-Type: application/json
+
+{
+  "name": "Stree Fighter II Turbo",
+    "genreId": "4e179397-c3f1-45ec-a271-c26f07ff64f3",
+    "price": 9.99,
+    "releaseDate": "1992-07-15",
+    "description": "Street Fighter 2, the most iconic fighting game of all time, is back on the Nintendo Switch! The newest iteration of SFII in nearly 10 years, Ultra Street Fighter 2 features all of the classic characters, a host of new single player and multiplayer features, as well as two new fighters: Evil Ryu and Violent Ken!"
+}
+
+###
+DELETE http://localhost:5082/games/5653974f-01b9-4097-b38f-46060996b684
+
+###
+GET http://localhost:5082/genres

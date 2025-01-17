@@ -7,4 +7,4 @@ public record GetGamesDto(
 
 public record GamesPageDto(int TotalPages, IEnumerable<GameSummaryDto> Data);
 
-public record GameSummaryDto(Guid Id, string Name, string Genre, decimal Price, DateOnly ReleaseDate, string ImageUri);
+public record GameSummaryDto(Guid Id, string Name, string Genre, decimal Price, DateOnly ReleaseDate, string ImageUri, string LastUpdatedBy);

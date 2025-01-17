@@ -49,7 +49,8 @@ public static class DataExtensions
                 ReleaseDate = new DateOnly(2010, 09, 30),
                 Description =
                     "Join over 27 million adventurers worldwide and take part in an epic and ever-changing FINAL FANTASY. Experience an unforgettable story, exhilarating battles, and a myriad of captivating environments to explore.",
-                ImageUri = "https://placehold.co/100"
+                ImageUri = "https://placehold.co/100",
+                LastUpdatedBy = "bberr"
             },
             new Game
             {
@@ -61,7 +62,8 @@ public static class DataExtensions
                 ReleaseDate = new DateOnly(2011, 11, 18),
                 Description =
                     "Survive the night or create a work of art in the hit sandbox game! Build anything you can imagine, uncover mysteries, and face thrilling foes in an infinite world that's unique in every playthrough. There's no wrong way to play!",
-                ImageUri = "https://placehold.co/100"
+                ImageUri = "https://placehold.co/100",
+                LastUpdatedBy = "bberr"
             },
             new Game
             {
@@ -73,7 +75,8 @@ public static class DataExtensions
                 ReleaseDate = new DateOnly(2022, 09, 27),
                 Description =
                     "FIFA 23 brings The World's Game to the pitch, with HyperMotion2 Technology, men's and women's FIFA World Cup\u2122, women's club teams, cross-play features, and more.",
-                ImageUri = "https://placehold.co/100"
+                ImageUri = "https://placehold.co/100",
+                LastUpdatedBy = "bberr"
             },
             new Game
             {
@@ -85,7 +88,8 @@ public static class DataExtensions
                 ReleaseDate = new DateOnly(1992, 07, 15),
                 Description =
                     "Street Fighter 2, the most iconic fighting game of all time, is back on the Nintendo Switch! The newest iteration of SFII in nearly 10 years, Ultra Street Fighter 2 features all of the classic characters, a host of new single player and multiplayer features, as well as two new fighters: Evil Ryu and Violent Ken!",
-                ImageUri = "https://placehold.co/100"
+                ImageUri = "https://placehold.co/100",
+                LastUpdatedBy = "bberr"
             }
         );
 

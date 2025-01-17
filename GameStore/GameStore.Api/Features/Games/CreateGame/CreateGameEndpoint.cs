@@ -1,4 +1,5 @@
-﻿using System.Security.Claims;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using GameStore.Api.Data;
 using GameStore.Api.Features.Games.Constants;
 using GameStore.Api.Models;
@@ -20,6 +21,10 @@ public static class CreateGameEndpoint
                     if (user.Identity?.IsAuthenticated == false)
                         return Results.Unauthorized();
 
+                    var currentUserId = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+                    if (string.IsNullOrEmpty(currentUserId)) return Results.Unauthorized();
+
                     var imageUri = DefaultImageUri;
 
                     if (createGameDto.ImageFile is not null)
@@ -39,7 +44,8 @@ public static class CreateGameEndpoint
                         Price = createGameDto.Price,
                         ReleaseDate = createGameDto.ReleaseDate,
                         Description = createGameDto.Description,
-                        ImageUri = imageUri!
+                        ImageUri = imageUri!,
+                        LastUpdatedBy = currentUserId
                     };
 
                     dbContext.Games.Add(game);
@@ -50,7 +56,7 @@ public static class CreateGameEndpoint
 
                     return Results.CreatedAtRoute(EndpointNames.GetGame, new { id = game.Id },
                         new GameDetailsDto(game.Id, game.Name, game.GenreId, game.Price, game.ReleaseDate,
-                            game.Description, game.ImageUri));
+                            game.Description, game.ImageUri, game.LastUpdatedBy));
                 })
             .WithParameterValidation()
             .WithName(EndpointNames.CreateGame)

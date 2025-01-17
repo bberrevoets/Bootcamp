@@ -47,6 +47,8 @@ builder.Services.AddHttpContextAccessor()
 builder.Services.AddAuthentication()
     .AddJwtBearer(options => { options.MapInboundClaims = false; });
 
+builder.Services.AddAuthorizationBuilder();
+
 var app = builder.Build();
 
 app.UseStaticFiles();

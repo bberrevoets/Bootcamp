@@ -36,8 +36,7 @@ public class FileUploader(IWebHostEnvironment environment, IHttpContextAccessor 
         await file.CopyToAsync(stream);
 
         var httpContext = httpContextAccessor.HttpContext;
-        var fileUrl =
-            $"{httpContext?.Request.Scheme}://{httpContext?.Request.Host}{httpContext?.Connection.LocalPort.ToString()}/{folder}/{safeFileName}";
+        var fileUrl = $"{httpContext?.Request.Scheme}://{httpContext?.Request.Host}/{folder}/{safeFileName}";
         result.FileUrl = fileUrl;
         result.IsSuccess = true;
 

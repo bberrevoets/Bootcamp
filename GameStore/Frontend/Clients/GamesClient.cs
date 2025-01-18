@@ -1,20 +1,25 @@
-﻿using System.Globalization;
-using System.Net.Http.Headers;
+﻿using System.Net.Http.Headers;
 using GameStore.Frontend.Models;
 
 namespace GameStore.Frontend.Clients;
 
 public class GamesClient(HttpClient httpClient)
 {
+    private readonly List<string> defaultDetail = ["Unknown error."];
+
     public async Task<GamesPage> GetGamesAsync(int pageNumber, int pageSize, string? nameSearch)
     {
-        var query = QueryString.Create("pageNumber", pageNumber.ToString())
-            .Add("pageSize", pageSize.ToString());
 
-        if (!string.IsNullOrWhiteSpace(nameSearch)) query = query.Add("name", nameSearch);
+        var query = QueryString.Create("pageNumber", pageNumber.ToString())
+                               .Add("pageSize", pageSize.ToString());
+
+        if (!string.IsNullOrWhiteSpace(nameSearch))
+        {
+            query = query.Add("name", nameSearch);
+        }
 
         return await httpClient.GetFromJsonAsync<GamesPage>($"games{query}")
-               ?? new GamesPage(0, []);
+            ?? new GamesPage(0, []);
     }
 
     public async Task<CommandResult> AddGameAsync(GameDetails game)
@@ -24,10 +29,8 @@ public class GamesClient(HttpClient httpClient)
     }
 
     public async Task<GameDetails> GetGameAsync(Guid id)
-    {
-        return await httpClient.GetFromJsonAsync<GameDetails>($"games/{id}")
-               ?? throw new Exception("Could not find game!");
-    }
+        => await httpClient.GetFromJsonAsync<GameDetails>($"games/{id}")
+            ?? throw new Exception("Could not find game!");
 
     public async Task<CommandResult> UpdateGameAsync(GameDetails updatedGame)
     {
@@ -47,20 +50,21 @@ public class GamesClient(HttpClient httpClient)
         {
             { new StringContent(game.Name), nameof(game.Name) },
             { new StringContent(game.GenreId.ToString()!), nameof(game.GenreId) },
-            { new StringContent(game.Price.ToString(CultureInfo.InvariantCulture)), nameof(game.Price) },
-            { new StringContent(game.ReleaseDate.ToString("yyyy-MM-dd")), nameof(game.ReleaseDate) },
+            { new StringContent(game.Price.ToString()), nameof(game.Price) },
+            { new StringContent(game.ReleaseDate.ToString()), nameof(game.ReleaseDate) },
             { new StringContent(game.Description), nameof(game.Description) }
         };
-
-        if (game.ImageFile is null) return formData;
-
-        var streamContent = new StreamContent(game.ImageFile.OpenReadStream())
+    
+        if (game.ImageFile is not null)
         {
-            Headers = { ContentType = new MediaTypeHeaderValue(game.ImageFile.ContentType) }
-        };
+            var streamContent = new StreamContent(game.ImageFile.OpenReadStream())
+            {
+                Headers = { ContentType = new MediaTypeHeaderValue(game.ImageFile.ContentType) }
+            };
 
-        formData.Add(streamContent, "ImageFile", game.ImageFile.FileName);
-
+            formData.Add(streamContent, "ImageFile", game.ImageFile.FileName);
+        }
+        
         return formData;
     }
 }

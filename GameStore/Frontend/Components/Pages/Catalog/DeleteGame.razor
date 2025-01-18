@@ -10,12 +10,12 @@
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
 
                 <form method="post" data-enhance>
-                    <input type="hidden" name="_handler" value="delete-game-form"/>
-                    <AntiforgeryToken/>
-                    <button type="submit"
-                            name="GameIdToDelete"
+                    <input type="hidden" name="_handler" value="delete-game-form" />
+                    <AntiforgeryToken />
+                    <button type="submit" 
+                            name="GameIdToDelete" 
                             value="@Game!.Id"
-                            class="btn btn-primary"
+                            class="btn btn-primary" 
                             data-bs-dismiss="modal">
                         Delete
                     </button>
@@ -26,9 +26,11 @@
 </div>
 
 @code {
-    [Parameter] public GameSummary? Game { get; set; }
+    [Parameter]
+    public GameSummary? Game { get; set; }
 
-    [SupplyParameterFromForm] private int? GameIdToDelete { get; set; }
+    [SupplyParameterFromForm]
+    private int? GameIdToDelete { get; set; }    
 
     private string title = string.Empty;
 
@@ -42,5 +44,4 @@
         ArgumentNullException.ThrowIfNull(game);
         return $"deleteModal-{game.Id}";
     }
-
 }

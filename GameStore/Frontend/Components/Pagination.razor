@@ -17,26 +17,21 @@
 
             <li class="page-item @(!PaginationInfo.HasNext ? "disabled" : null)">
                 <a class="page-link" href="@PaginationUri(PaginationInfo.CurrentPage + 1)">Next</a>
-            </li>
+            </li>            
         </ul>
     </nav>
 }
 
 @code {
-    [Parameter] public PaginationInfo? PaginationInfo { get; set; }
+    [Parameter]
+    public PaginationInfo? PaginationInfo { get; set; }
 
-    private IEnumerable<int> GetPageNumbers(PaginationInfo paginationInfo)
+    private IEnumerable<int> GetPageNumbers(PaginationInfo paginationInfo) 
+        => Enumerable.Range(1, paginationInfo.TotalPages);
+
+    private string PaginationUri(int page) => Navigation.GetUriWithQueryParameters(new Dictionary<string, object?>()
     {
-        return Enumerable.Range(1, paginationInfo.TotalPages);
-    }
-
-    private string PaginationUri(int page)
-    {
-        return Navigation.GetUriWithQueryParameters(new Dictionary<string, object?>
-        {
-            { "page", page == 1 ? null : page },
-            { "name", PaginationInfo!.NameSearch ?? null }
-        });
-    }
-
+        { "page", page == 1 ? null : page },
+        { "name", PaginationInfo!.NameSearch ?? null }
+    });          
 }

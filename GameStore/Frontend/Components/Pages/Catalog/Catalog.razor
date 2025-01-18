@@ -1,7 +1,9 @@
 ﻿@page "/catalog"
+@using GameStore.Frontend.Authorization
 @inject GamesClient Client
 @inject NavigationManager NavigationManager
 @attribute [StreamRendering]
+@attribute [Authorize(Roles=@Roles.Admin)]
 
 <PageTitle>Game Catalog</PageTitle>
 
@@ -17,13 +19,15 @@
 
 <div class="row mt-2">
     <div class="col">
-        <a class="btn btn-primary" role="button" href="/catalog/editgame">New Game</a>
+        <AuthorizeView Roles="@Roles.Admin">
+            <a class="btn btn-primary" role="button" href="/catalog/editgame">New Game</a>
+        </AuthorizeView>
     </div>
     <div class="col-sm-4">
         <form id="searchGamesForm" method="post" class="d-flex" role="search" @formname="searchGames" data-permanent>
-            <AntiforgeryToken/>
+            <AntiforgeryToken />
             <InputText class="form-control me-2" type="search" @bind-Value="NameSearch" onsearch="clearSearch()"
-                       placeholder="Search..." aria-label="Search"/>
+                placeholder="Search..." aria-label="Search" />
             <button class="btn btn-outline-primary" type="submit">Search</button>
         </form>
     </div>
@@ -31,51 +35,53 @@
 
 @if (gamesPage is null || paginationInfo is null)
 {
-    <p>
-        <em>Loading...</em>
-    </p>
+    <p><em>Loading...</em></p>
 }
 else
 {
     <table class="table table-striped table-bordered table-hover mt-3">
         <thead class="table-dark">
-        <th>Image</th>
-        <th>Name</th>
-        <th>Genre</th>
-        <th class="text-end">Price</th>
-        <th>Release Date</th>
-        <th></th>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Genre</th>
+            <th class="text-end">Price</th>
+            <th>Release Date</th>
+            <th>Last Updated</th>
+            <th></th>
         </thead>
         <tbody>
-        @foreach (var game in gamesPage.Data)
-        {
-            <tr>
-                <td style="max-width: 60px; width: 60px;">
-                    <img src="@game.ImageUri" alt="@game.Name" style="object-fit: contain; width: 50px;">
-                </td>
-                <td>@game.Name</td>
-                <td>@game.Genre</td>
-                <td class="text-end">$@game.Price</td>
-                <td>@game.ReleaseDate</td>
-                <td>
-                    <div class="d-flex">
-                        <a class="btn btn-primary me-2" role="button" href="@GameUrl(game.Id)">
-                            <i class="bi bi-pencil"></i>
-                        </a>
-                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@GetDeleteModalId(game)">
-                            <i class="bi bi-x-lg"></i>
-                        </button>
-                    </div>
-                    <DeleteGame Game="@game"/>
-                </td>
-            </tr>
-        }
+            @foreach (var game in gamesPage.Data)
+            {
+                <tr>
+                    <td style="width: 60px; max-width: 60px;">
+                        <img src="@game.ImageUri" alt="@game.Name" style="width: 50px; object-fit: contain;">
+                    </td>
+                    <td>@game.Name</td>
+                    <td>@game.Genre</td>
+                    <td class="text-end">$@game.Price</td>
+                    <td>@game.ReleaseDate</td>
+                    <td>@game.LastUpdatedBy</td>
+                    <td>
+                        <AuthorizeView Roles="@Roles.Admin">
+                            <div class="d-flex">
+                                <a class="btn btn-primary me-2" role="button" href="@GameUrl(game.Id)">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="@GetDeleteModalId(game)">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <DeleteGame Game="@game" />
+                        </AuthorizeView>
+                    </td>
+                </tr>
+            }
         </tbody>
     </table>
 
     <div class="row mt-2">
         <div class="col">
-            <Pagination PaginationInfo="paginationInfo"/>
+            <Pagination PaginationInfo="paginationInfo" />
         </div>
     </div>
 }
@@ -89,13 +95,17 @@ else
 
     const int PageSize = 5;
 
-    [SupplyParameterFromQuery] public int? Page { get; set; }
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
 
-    [SupplyParameterFromQuery] public string? Name { get; set; }
+    [SupplyParameterFromQuery]
+    public string? Name { get; set; }
 
-    [SupplyParameterFromForm] public string? NameSearch { get; set; }
+    [SupplyParameterFromForm]
+    public string? NameSearch { get; set; }
 
-    [SupplyParameterFromForm] private Guid? GameIdToDelete { get; set; }
+    [SupplyParameterFromForm]
+    private Guid? GameIdToDelete { get; set; }
 
     private List<string> errorList = [];
 
@@ -108,15 +118,9 @@ else
         paginationInfo = new PaginationInfo(pageNumber, gamesPage.TotalPages, Name);
     }
 
-    private static string GameUrl(Guid id)
-    {
-        return $"/catalog/editgame/{id}";
-    }
+    private static string GameUrl(Guid id) => $"/catalog/editgame/{id}";
 
-    private static string GameCodesUrl(Guid id)
-    {
-        return $"/catalog/gamecodes/{id}";
-    }
+    private static string GameCodesUrl(Guid id) => $"/catalog/gamecodes/{id}";
 
     private string GetDeleteModalId(GameSummary game)
     {
@@ -146,19 +150,18 @@ else
 
         if (result.Succeeded)
         {
-            NavigationManager.Refresh();
+            NavigationManager.Refresh();            
         }
-        else
-        {
+        else{
             errorList = result.Errors;
         }
     }
-
 }
 
 <script>
-    function clearSearch() {
-        const searchform = document.getElementById("searchGamesForm");
+    function clearSearch()
+    {
+        var searchform = document.getElementById("searchGamesForm");
         searchform.submit();
     }
 </script>

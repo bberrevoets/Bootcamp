@@ -7,9 +7,9 @@
 <div class="row mt-2">
     <div class="col-sm-4">
         <form id="searchGamesForm" method="post" class="d-flex" role="search" @formname="searchGames" data-permanent>
-            <AntiforgeryToken/>
+            <AntiforgeryToken />
             <InputText class="form-control me-2" type="search" @bind-Value="NameSearch" onsearch="clearSearch()"
-                       placeholder="Search store" aria-label="Search"/>
+                placeholder="Search store" aria-label="Search" />
             <button class="btn btn-outline-primary" type="submit">Search</button>
         </form>
     </div>
@@ -17,9 +17,7 @@
 
 @if (gamesPage is null || paginationInfo is null)
 {
-    <p class="mt-3">
-        <em>Loading...</em>
-    </p>
+    <p class="mt-3"><em>Loading...</em></p>
 }
 else
 {
@@ -44,7 +42,7 @@ else
 
     <div class="row mt-2">
         <div class="col">
-            <Pagination PaginationInfo="paginationInfo"/>
+            <Pagination PaginationInfo="paginationInfo" />
         </div>
     </div>
 }
@@ -56,11 +54,14 @@ else
 
     const int PageSize = 10;
 
-    [SupplyParameterFromQuery] public int? Page { get; set; }
+    [SupplyParameterFromQuery]
+    public int? Page { get; set; }
 
-    [SupplyParameterFromQuery] public string? Name { get; set; }
+    [SupplyParameterFromQuery]
+    public string? Name { get; set; }
 
-    [SupplyParameterFromForm] public string? NameSearch { get; set; }
+    [SupplyParameterFromForm]
+    public string? NameSearch { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,12 +87,12 @@ else
             Page = 1;
         }
     }
-
 }
 
 <script>
-    function clearSearch() {
-        const searchform = document.getElementById("searchGamesForm");
+    function clearSearch()
+    {
+        var searchform = document.getElementById("searchGamesForm");
         searchform.submit();
     }
 </script>

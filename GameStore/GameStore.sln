@@ -14,8 +14,16 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{2082319A-518A-471D-ACDD-42338362063C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameStore.Api", "GameStore.Api\GameStore.Api.csproj", "{DD1C87E5-E9BF-4416-A62F-C1032636D1B6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{537E57D4-D319-4D98-A752-37ED2627DF8D} = {537E57D4-D319-4D98-A752-37ED2627DF8D}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameStore.Frontend", "Frontend\GameStore.Frontend.csproj", "{C5B82561-34DD-4F21-8660-601F11DFF881}"
+	ProjectSection(ProjectDependencies) = postProject
+		{DD1C87E5-E9BF-4416-A62F-C1032636D1B6} = {DD1C87E5-E9BF-4416-A62F-C1032636D1B6}
+	EndProjectSection
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose for Development Environment", "docker-compose for Development Environment\docker-compose for Development Environment.dcproj", "{537E57D4-D319-4D98-A752-37ED2627DF8D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,6 +39,10 @@ Global
 		{C5B82561-34DD-4F21-8660-601F11DFF881}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5B82561-34DD-4F21-8660-601F11DFF881}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5B82561-34DD-4F21-8660-601F11DFF881}.Release|Any CPU.Build.0 = Release|Any CPU
+		{537E57D4-D319-4D98-A752-37ED2627DF8D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{537E57D4-D319-4D98-A752-37ED2627DF8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{537E57D4-D319-4D98-A752-37ED2627DF8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{537E57D4-D319-4D98-A752-37ED2627DF8D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -38,6 +50,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{DD1C87E5-E9BF-4416-A62F-C1032636D1B6} = {D333BEC7-E69B-4DC7-A338-454240B627A4}
 		{C5B82561-34DD-4F21-8660-601F11DFF881} = {2082319A-518A-471D-ACDD-42338362063C}
+		{537E57D4-D319-4D98-A752-37ED2627DF8D} = {106D2039-0B94-478E-ADE0-6BFE6E440C46}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7E09B12A-DDA5-460E-84D3-905FF6E678F3}

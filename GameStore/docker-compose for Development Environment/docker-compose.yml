@@ -1,0 +1,33 @@
+services:
+  smtp4dev:
+    image: rnwood/smtp4dev:latest
+    restart: always
+    container_name: smtp4dev_GameStore
+    ports:
+      # Change the number before : to the port the web interface should be accessible on
+      - '8081:80'
+      # Change the number before : to the port the SMTP server should be accessible on
+      - '25:25'
+      # Change the number before : to the port the IMAP server should be accessible on
+      - '143:143'
+    volumes:
+      # This is where smtp4dev stores the database..
+        - smtp4dev-GameStore-data:/smtp4dev
+    environment:
+      - ServerOptions__HostName=smtp4dev
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0.7
+    container_name: keycloak_GameStore
+    ports:
+        - "8080:8080"
+    environment:
+        - KC_BOOTSTRAP_ADMIN_USERNAME=admin
+        - KC_BOOTSTRAP_ADMIN_PASSWORD=admin
+    volumes:
+        - keycloak-GameStore-data:/opt/keycloak/data
+    command: ["start-dev"]
+
+volumes:
+  smtp4dev-GameStore-data:
+  keycloak-GameStore-data:  

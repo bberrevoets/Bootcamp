@@ -1,6 +1,8 @@
-﻿using GameStore.Api.Data;
+﻿using System.Security.Claims;
+using GameStore.Api.Data;
+using GameStore.Api.Features.Baskets.Authorization;
 using GameStore.Api.Models;
-using GameStore.Api.Shared.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Api.Features.Baskets.GetBasket;
@@ -9,7 +11,7 @@ public static class GetBasketEndpoint
 {
     public static void MapGetBasket(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/{userId:guid}", async (Guid userId, GameStoreContext dbContext) =>
+        app.MapGet("/{userId:guid}", async (Guid userId, GameStoreContext dbContext, IAuthorizationService authorizationService, ClaimsPrincipal user) =>
         {
             if (userId == Guid.Empty) return Results.BadRequest();
 
@@ -17,6 +19,14 @@ public static class GetBasketEndpoint
                 .Include(basket => basket.Items)
                 .ThenInclude(item => item.Game)
                 .FirstOrDefaultAsync(basket => basket.Id == userId) ?? new CustomerBasket { Id = userId };
+
+            var authResult = await authorizationService.AuthorizeAsync(
+                user,
+                basket,
+                new OwnerOrAdminRequirement()
+            );
+
+            if (!authResult.Succeeded) return Results.Forbid();
 
             var dto = new BasketDto(
                 basket.Id,

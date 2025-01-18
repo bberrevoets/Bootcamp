@@ -58,12 +58,6 @@ var app = builder.Build();
 
 app.UseStaticFiles();
 
-app.MapGames();
-app.MapGenres();
-app.MapBaskets();
-
-app.UseHttpLogging();
-
 // Add Swagger middleware
 if (app.Environment.IsDevelopment())
 {
@@ -75,6 +69,14 @@ if (app.Environment.IsDevelopment())
         options.DefaultModelsExpandDepth(-1);
     });
 }
+
+app.UseAuthorization();
+
+app.MapGames();
+app.MapGenres();
+app.MapBaskets();
+
+app.UseHttpLogging();
 
 if (!app.Environment.IsDevelopment()) app.UseExceptionHandler();
 

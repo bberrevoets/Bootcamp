@@ -16,6 +16,7 @@ public static class GetNameEndpoint
                     : Results.Ok(new GameDetailsDto(game.Id, game.Name, game.GenreId, game.Price, game.ReleaseDate,
                         game.Description, game.ImageUri, game.LastUpdatedBy));
             })
+            .AllowAnonymous()
             .WithName(EndpointNames.GetGame);
     }
 }

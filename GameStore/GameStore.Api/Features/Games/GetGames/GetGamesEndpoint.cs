@@ -1,4 +1,5 @@
 ﻿using GameStore.Api.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Api.Features.Games.GetGames;
@@ -38,6 +39,7 @@ public static class GetGamesEndpoint
             var totalPages = (int)Math.Ceiling(totalGames / (double)request.PageSize);
 
             return new GamesPageDto(totalPages, gamesOnPage);
-        });
+        })
+        .AllowAnonymous();
     }
 }

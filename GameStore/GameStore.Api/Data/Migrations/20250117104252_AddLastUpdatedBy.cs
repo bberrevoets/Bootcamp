@@ -15,7 +15,7 @@ namespace GameStore.Api.Data.Migrations
                 table: "Games",
                 type: "TEXT",
                 nullable: false,
-                defaultValue: "berr");
+                defaultValue: "bberr");
         }
 
         /// <inheritdoc />

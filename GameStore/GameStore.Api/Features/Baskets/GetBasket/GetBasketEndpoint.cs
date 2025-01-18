@@ -1,5 +1,6 @@
 ﻿using GameStore.Api.Data;
 using GameStore.Api.Models;
+using GameStore.Api.Shared.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Api.Features.Baskets.GetBasket;
@@ -28,6 +29,6 @@ public static class GetBasketEndpoint
 
                 return Results.Ok(dto);
             })
-            .RequireAuthorization(builder => builder.RequireClaim("scope", "basket.read"));
+            .RequireAuthorization(Policies.UserAccess);
     }
 }

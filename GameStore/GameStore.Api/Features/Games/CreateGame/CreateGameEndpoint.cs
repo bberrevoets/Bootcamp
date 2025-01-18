@@ -89,6 +89,6 @@ public static class CreateGameEndpoint
         })
         .WithParameterValidation()
         .DisableAntiforgery()
-        .RequireAuthorization(builder => builder.RequireRole(Roles.Admin));
+        .RequireAuthorization(Policies.AdminAccess);
     }
 }

@@ -2,6 +2,7 @@ using GameStore.Api.Data;
 using GameStore.Api.Features.Baskets;
 using GameStore.Api.Features.Games;
 using GameStore.Api.Features.Genres;
+using GameStore.Api.Shared.Authorization;
 using GameStore.Api.Shared.ErrorHandling;
 using GameStore.Api.Shared.FileUpload;
 using Microsoft.AspNetCore.HttpLogging;
@@ -51,7 +52,16 @@ builder.Services.AddAuthentication()
         options.TokenValidationParameters.RoleClaimType = "role";
     });
 
-builder.Services.AddAuthorizationBuilder();
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy(Policies.UserAccess, authBuilder =>
+    {
+        authBuilder.RequireClaim("scope", "gamestore_api.all");
+    })
+    .AddPolicy(Policies.AdminAccess, authBuilder =>
+    {
+        authBuilder.RequireClaim("scope", "gamestore_api.all");
+        authBuilder.RequireRole(Roles.Admin);
+    });
 
 var app = builder.Build();
 

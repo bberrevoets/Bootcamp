@@ -48,6 +48,8 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddHttpContextAccessor()
     .AddSingleton<FileUploader>();
 
+builder.Services.AddSingleton<KeycloakClamsTransformer>();
+
 builder.Services.AddAuthentication(Schemes.Keycloak)
     .AddJwtBearer(options =>
     {
@@ -65,14 +67,10 @@ builder.Services.AddAuthentication(Schemes.Keycloak)
         {
             OnTokenValidated = context =>
             {
-                var claims = context.Principal?.Claims;
+                var transformer = context.HttpContext.RequestServices.GetRequiredService<KeycloakClamsTransformer>();
 
-                if (claims is null) return Task.CompletedTask;
+                transformer.Transform(context);
 
-                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
-
-                foreach (var claim in claims)
-                    logger.LogInformation("Claim: {ClaimType}, Value: {ClaimValue}", claim.Type, claim.Value);
                 return Task.CompletedTask;
             }
         };

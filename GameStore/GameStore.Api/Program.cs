@@ -47,11 +47,18 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddHttpContextAccessor()
     .AddSingleton<FileUploader>();
 
-builder.Services.AddAuthentication()
+builder.Services.AddAuthentication(Schemes.Keycloak)
     .AddJwtBearer(options =>
     {
         options.MapInboundClaims = false;
-        options.TokenValidationParameters.RoleClaimType = "role";
+        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
+    })
+    .AddJwtBearer(Schemes.Keycloak, options =>
+    {
+        options.Authority = "http://localhost:8080/realms/gamestore";
+        options.Audience = "gamestore-api";
+        options.MapInboundClaims = false;
+        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
     });
 
 builder.AddGameStoreAuthorization();

@@ -19,7 +19,8 @@ public static class UpdateGameEndpoint
                     if (user.Identity?.IsAuthenticated == false)
                         return Results.Unauthorized();
 
-                    var currentUserId = user.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                    var currentUserId = user?.FindFirstValue(JwtRegisteredClaimNames.Email)
+                                        ?? user?.FindFirstValue(JwtRegisteredClaimNames.Sub);
 
                     if (string.IsNullOrEmpty(currentUserId)) return Results.Unauthorized();
                     var existingGame = await dbContext.Games.FindAsync(id);

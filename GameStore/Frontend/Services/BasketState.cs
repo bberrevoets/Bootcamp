@@ -1,4 +1,6 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
+using System.Threading.Tasks;
 using GameStore.Frontend.Clients;
 using GameStore.Frontend.Models;
 using Microsoft.AspNetCore.Components;

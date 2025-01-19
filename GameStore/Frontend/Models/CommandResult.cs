@@ -1,4 +1,6 @@
-﻿namespace GameStore.Frontend.Models;
+﻿using System.Collections.Generic;
+
+namespace GameStore.Frontend.Models;
 
 public record CommandResult(bool Succeeded)
 {

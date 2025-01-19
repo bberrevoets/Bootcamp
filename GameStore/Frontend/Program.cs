@@ -1,7 +1,11 @@
+using System;
 using GameStore.Frontend.Authorization;
 using GameStore.Frontend.Clients;
 using GameStore.Frontend.Components;
 using GameStore.Frontend.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 

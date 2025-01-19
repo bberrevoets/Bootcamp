@@ -1485,21 +1485,6 @@
           }
         },
         {
-          "id": "133d7492-682c-4cbe-8a25-f4c93e0d70a2",
-          "name": "realm roles",
-          "protocol": "openid-connect",
-          "protocolMapper": "oidc-usermodel-realm-role-mapper",
-          "consentRequired": false,
-          "config": {
-            "user.attribute": "foo",
-            "introspection.token.claim": "true",
-            "access.token.claim": "true",
-            "claim.name": "realm_access.roles",
-            "jsonType.label": "String",
-            "multivalued": "true"
-          }
-        },
-        {
           "id": "d4996557-19f3-41f9-acf2-738991e2c9b1",
           "name": "client roles",
           "protocol": "openid-connect",
@@ -1512,6 +1497,23 @@
             "claim.name": "resource_access.${client_id}.roles",
             "jsonType.label": "String",
             "multivalued": "true"
+          }
+        },
+        {
+          "id": "980ad96d-de8b-4fb4-be60-3aecbe6487cf",
+          "name": "Game Store Role",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-usermodel-realm-role-mapper",
+          "consentRequired": false,
+          "config": {
+            "introspection.token.claim": "true",
+            "multivalued": "true",
+            "userinfo.token.claim": "true",
+            "id.token.claim": "true",
+            "lightweight.claim": "false",
+            "access.token.claim": "true",
+            "claim.name": "role",
+            "jsonType.label": "String"
           }
         }
       ]

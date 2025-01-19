@@ -6,6 +6,7 @@ using GameStore.Api.Features.Genres;
 using GameStore.Api.Shared.Authorization;
 using GameStore.Api.Shared.ErrorHandling;
 using GameStore.Api.Shared.FileUpload;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.OpenApi.Models;
@@ -60,6 +61,21 @@ builder.Services.AddAuthentication(Schemes.Keycloak)
         options.MapInboundClaims = false;
         options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
         options.RequireHttpsMetadata = false;
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                var claims = context.Principal?.Claims;
+
+                if (claims is null) return Task.CompletedTask;
+
+                var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+
+                foreach (var claim in claims)
+                    logger.LogInformation("Claim: {ClaimType}, Value: {ClaimValue}", claim.Type, claim.Value);
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.AddGameStoreAuthorization();

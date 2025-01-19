@@ -17,78 +17,70 @@ public static class CreateGameEndpoint
     {
         // POST /games
         app.MapPost("/", async (
-            [FromForm] CreateGameDto gameDto,
-            GameStoreContext dbContext,
-            ILogger<Program> logger,
-            FileUploader fileUploader,
-            ClaimsPrincipal user) =>
-        {
-            if (user?.Identity?.IsAuthenticated == false)
+                [FromForm] CreateGameDto gameDto,
+                GameStoreContext dbContext,
+                ILogger<Program> logger,
+                FileUploader fileUploader,
+                ClaimsPrincipal user) =>
             {
-                return Results.Unauthorized();
-            }
+                if (user?.Identity?.IsAuthenticated == false) return Results.Unauthorized();
 
-            var currentUserId = user?.FindFirstValue(JwtRegisteredClaimNames.Email) 
-                                ?? user?.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                var currentUserId = user?.FindFirstValue(JwtRegisteredClaimNames.Email)
+                                    ?? user?.FindFirstValue(JwtRegisteredClaimNames.Sub);
 
-            if (string.IsNullOrEmpty(currentUserId))
-            {
-                return Results.Unauthorized();
-            }
+                if (string.IsNullOrEmpty(currentUserId)) return Results.Unauthorized();
 
-            var imageUri = DefaultImageUri;
+                var imageUri = DefaultImageUri;
 
-            if (gameDto.ImageFile is not null)
-            {
-                var fileUploadResult = await fileUploader.UploadFileAsync(
-                    gameDto.ImageFile,
-                    StorageNames.GameImagesFolder
-                );
-
-                if (!fileUploadResult.IsSuccess)
+                if (gameDto.ImageFile is not null)
                 {
-                    return Results.BadRequest(new { message = fileUploadResult.ErrorMessage });
+                    var fileUploadResult = await fileUploader.UploadFileAsync(
+                        gameDto.ImageFile,
+                        StorageNames.GameImagesFolder
+                    );
+
+                    if (!fileUploadResult.IsSuccess)
+                        return Results.BadRequest(new { message = fileUploadResult.ErrorMessage });
+
+                    imageUri = fileUploadResult.FileUrl;
                 }
 
-                imageUri = fileUploadResult.FileUrl;
-            }
+                var game = new Game
+                {
+                    Name = gameDto.Name,
+                    GenreId = gameDto.GenreId,
+                    Price = gameDto.Price,
+                    ReleaseDate = gameDto.ReleaseDate,
+                    Description = gameDto.Description,
+                    ImageUri = imageUri!,
+                    LastUpdatedBy = currentUserId
+                };
 
-            var game = new Game
-            {
-                Name = gameDto.Name,
-                GenreId = gameDto.GenreId,
-                Price = gameDto.Price,
-                ReleaseDate = gameDto.ReleaseDate,
-                Description = gameDto.Description,
-                ImageUri = imageUri!,
-                LastUpdatedBy = currentUserId
-            };
+                dbContext.Games.Add(game);
 
-            dbContext.Games.Add(game);
+                await dbContext.SaveChangesAsync();
 
-            await dbContext.SaveChangesAsync();
-
-            logger.LogInformation(
-                "Created game {GameName} with price {GamePrice}",
-                game.Name,
-                game.Price);
-
-            return Results.CreatedAtRoute(
-                EndpointNames.GetGame,
-                new { id = game.Id },
-                new GameDetailsDto(
-                    game.Id,
+                logger.LogInformation(
+                    "Created game {GameName} with price {GamePrice}",
                     game.Name,
-                    game.GenreId,
-                    game.Price,
-                    game.ReleaseDate,
-                    game.Description,
-                    game.ImageUri,
-                    game.LastUpdatedBy
-                ));
-        })
-        .WithParameterValidation()
-        .DisableAntiforgery()
-        .RequireAuthorization(Policies.AdminAccess);
+                    game.Price);
+
+                return Results.CreatedAtRoute(
+                    EndpointNames.GetGame,
+                    new { id = game.Id },
+                    new GameDetailsDto(
+                        game.Id,
+                        game.Name,
+                        game.GenreId,
+                        game.Price,
+                        game.ReleaseDate,
+                        game.Description,
+                        game.ImageUri,
+                        game.LastUpdatedBy
+                    ));
+            })
+            .WithParameterValidation()
+            .DisableAntiforgery()
+            .RequireAuthorization(Policies.AdminAccess);
     }
 }

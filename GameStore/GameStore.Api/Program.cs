@@ -59,6 +59,7 @@ builder.Services.AddAuthentication(Schemes.Keycloak)
         options.Audience = "gamestore-api";
         options.MapInboundClaims = false;
         options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
+        options.RequireHttpsMetadata = false;
     });
 
 builder.AddGameStoreAuthorization();

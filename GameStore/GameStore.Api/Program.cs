@@ -14,9 +14,11 @@ using Microsoft.OpenApi.Models;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddProblemDetails();
+
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 var connString = builder.Configuration.GetConnectionString("GameStore");
+
 builder.Services.AddSqlite<GameStoreContext>(connString);
 
 builder.Services.AddHttpLogging(options =>
@@ -28,8 +30,8 @@ builder.Services.AddHttpLogging(options =>
     options.CombineLogs = true;
 });
 
-// Add Swagger services
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -50,33 +52,10 @@ builder.Services.AddHttpContextAccessor()
 
 builder.Services.AddSingleton<KeycloakClamsTransformer>();
 
-builder.Services.AddAuthentication(Schemes.Keycloak)
-    .AddJwtBearer(options =>
-    {
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-    })
-    .AddJwtBearer(Schemes.Keycloak, options =>
-    {
-        options.Authority = "http://localhost:8080/realms/gamestore";
-        options.Audience = "gamestore-api";
-        options.MapInboundClaims = false;
-        options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-        options.RequireHttpsMetadata = false;
-        options.Events = new JwtBearerEvents
-        {
-            OnTokenValidated = context =>
-            {
-                var transformer = context.HttpContext.RequestServices.GetRequiredService<KeycloakClamsTransformer>();
-
-                transformer.Transform(context);
-
-                return Task.CompletedTask;
-            }
-        };
-    });
+builder.AddGameStoreAuthentication();
 
 builder.AddGameStoreAuthorization();
+
 builder.Services.AddSingleton<IAuthorizationHandler, BasketAuthorizationHandler>();
 
 var app = builder.Build();

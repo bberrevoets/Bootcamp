@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GameStore.Api.Shared.Authorization;
 
-public class KeycloakClamsTransformer(ILogger<KeycloakClamsTransformer> logger)
+public class KeycloakClaimsTransformer(ILogger<KeycloakClaimsTransformer> logger)
 {
     public void Transform(TokenValidatedContext context)
     {

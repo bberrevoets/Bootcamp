@@ -23,7 +23,7 @@ public static class AuthorizationExtensions
                 {
                     OnTokenValidated = context =>
                     {
-                        var transformer = context.HttpContext.RequestServices.GetRequiredService<KeycloakClamsTransformer>();
+                        var transformer = context.HttpContext.RequestServices.GetRequiredService<KeycloakClaimsTransformer>();
                         transformer.Transform(context);
                         return Task.CompletedTask;
                     }

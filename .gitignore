@@ -368,3 +368,4 @@ FodyWeavers.xsd
 /GameStore/GameStore.Api/GameStore.db-wal
 /GameStore/GameStore.Api/GameStore.db
 /GameStore/GameStore.Api/wwwroot/GameImages
+/GameStore/published-api

@@ -1,4 +1,4 @@
-﻿namespace GameStore.Api.Shared.Authorization;
+namespace GameStore.Api.Shared.Authorization;
 
 public static class Schemes
 {

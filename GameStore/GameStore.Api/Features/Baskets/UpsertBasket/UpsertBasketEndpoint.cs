@@ -1,7 +1,8 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using GameStore.Api.Data;
 using GameStore.Api.Features.Baskets.Authorization;
 using GameStore.Api.Models;
+using GameStore.Api.Shared.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,8 +12,8 @@ public static class UpsertBasketEndpoint
 {
     public static void MapUpsertBasket(this IEndpointRouteBuilder app)
     {
-        // PUT /baskets/B98502E4-EC5E-4B23-8A56-A7B2BB241745
-        app.MapPut("/{userId:guid}", async (
+        // PUT /baskets/b3f5c1d2-4e2b-4a5e-9b8e-1f2d3c4b5a6f
+        app.MapPut("/{userId}", async (
             Guid userId,
             UpsertBasketDto upsertBasketDto,
             GameStoreContext dbContext,
@@ -21,8 +22,9 @@ public static class UpsertBasketEndpoint
         ) =>
         {
             var basket = await dbContext.Baskets
-                .Include(basket => basket.Items)
-                .FirstOrDefaultAsync(basket => basket.Id == userId);
+                                        .Include(basket => basket.Items)
+                                        .FirstOrDefaultAsync(
+                                            basket => basket.Id == userId);
 
             if (basket is null)
             {
@@ -53,7 +55,10 @@ public static class UpsertBasketEndpoint
                 new OwnerOrAdminRequirement()
             );
 
-            if (!authResult.Succeeded) return Results.Forbid();
+            if (!authResult.Succeeded)
+            {
+                return Results.Forbid();
+            }            
 
             await dbContext.SaveChangesAsync();
 

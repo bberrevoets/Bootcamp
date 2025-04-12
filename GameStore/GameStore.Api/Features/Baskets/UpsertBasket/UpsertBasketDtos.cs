@@ -1,4 +1,4 @@
-﻿namespace GameStore.Api.Features.Baskets.UpsertBasket;
+namespace GameStore.Api.Features.Baskets.UpsertBasket;
 
 public record class UpsertBasketDto(IEnumerable<UpsertBasketItemDto> Items);
 

@@ -1,7 +1,7 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using GameStore.Api.Data;
 using GameStore.Api.Features.Baskets.Authorization;
-using GameStore.Api.Models;
+using GameStore.Api.Shared.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,14 +11,24 @@ public static class GetBasketEndpoint
 {
     public static void MapGetBasket(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/{userId:guid}", async (Guid userId, GameStoreContext dbContext, IAuthorizationService authorizationService, ClaimsPrincipal user) =>
+        app.MapGet("/{userId}", async (
+            Guid userId,
+            GameStoreContext dbContext,
+            IAuthorizationService authorizationService,
+            ClaimsPrincipal user
+        ) =>
         {
-            if (userId == Guid.Empty) return Results.BadRequest();
+            if (userId == Guid.Empty)
+            {
+                return Results.BadRequest();
+            }
 
             var basket = await dbContext.Baskets
-                .Include(basket => basket.Items)
-                .ThenInclude(item => item.Game)
-                .FirstOrDefaultAsync(basket => basket.Id == userId) ?? new CustomerBasket { Id = userId };
+                                        .Include(basket => basket.Items)
+                                        .ThenInclude(item => item.Game)
+                                        .FirstOrDefaultAsync(
+                                            basket => basket.Id == userId)
+                                            ?? new() { Id = userId };
 
             var authResult = await authorizationService.AuthorizeAsync(
                 user,
@@ -26,7 +36,10 @@ public static class GetBasketEndpoint
                 new OwnerOrAdminRequirement()
             );
 
-            if (!authResult.Succeeded) return Results.Forbid();
+            if (!authResult.Succeeded)
+            {
+                return Results.Forbid();
+            }
 
             var dto = new BasketDto(
                 basket.Id,
@@ -35,7 +48,9 @@ public static class GetBasketEndpoint
                     item.Game!.Name,
                     item.Game!.Price,
                     item.Quantity,
-                    item.Game!.ImageUri)).OrderBy(item => item.Name));
+                    item.Game!.ImageUri
+                ))
+                .OrderBy(item => item.Name));
 
             return Results.Ok(dto);
         });

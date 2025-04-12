@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace GameStore.Frontend.Models;
+﻿namespace GameStore.Frontend.Models;
 
 public class CustomerBasket
 {

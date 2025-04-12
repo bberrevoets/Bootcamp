@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace GameStore.Api.Shared.Authorization;
@@ -11,19 +11,31 @@ public class KeycloakClaimsTransformer(ILogger<KeycloakClaimsTransformer> logger
 
         var scopeClaim = identity?.FindFirst(ClaimTypes.Scope);
 
-        if (scopeClaim is null) return;
+        if (scopeClaim is null)
+        {
+            return;
+        }
 
         var scopes = scopeClaim.Value.Split(' ');
 
         identity?.RemoveClaim(scopeClaim);
 
-        identity?.AddClaims(scopes.Select(scope => new Claim(ClaimTypes.Scope, scope)));
+        identity?.AddClaims(
+            scopes.Select(
+                scope => new Claim(ClaimTypes.Scope, scope)));
 
         var claims = context.Principal?.Claims;
 
-        if (claims is null) return;
+        if (claims is null)
+        {
+            return;
+        }
 
         foreach (var claim in claims)
-            logger.LogTrace("Claim: {ClaimType}, Value: {ClaimValue}", claim.Type, claim.Value);
+        {
+            logger.LogTrace("Claim: {ClaimType}, Value: {ClaimValue}",
+                                  claim.Type,
+                                  claim.Value);
+        }
     }
 }

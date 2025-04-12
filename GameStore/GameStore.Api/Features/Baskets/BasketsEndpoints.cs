@@ -1,4 +1,4 @@
-﻿using GameStore.Api.Features.Baskets.GetBasket;
+using GameStore.Api.Features.Baskets.GetBasket;
 using GameStore.Api.Features.Baskets.UpsertBasket;
 
 namespace GameStore.Api.Features.Baskets;

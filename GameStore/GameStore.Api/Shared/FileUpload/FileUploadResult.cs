@@ -1,8 +1,8 @@
-﻿namespace GameStore.Api.Shared.FileUpload;
+namespace GameStore.Api.Shared.FileUpload;
 
 public class FileUploadResult
 {
-    public bool IsSuccess { get; set; }
+    public bool IsSucess { get; set; }
 
     public string? FileUrl { get; set; }
 

@@ -1,11 +1,8 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 
 namespace GameStore.Frontend.Authorization;
@@ -20,8 +17,40 @@ public static class AuthenticationExtensions
 
         var authBuilder = builder.Services.AddAuthentication(idp);
 
+        builder.Services.AddSingleton<EntraClaimsTransformer>();
+
+        authBuilder.AddOpenIdConnect(Schemes.Entra,
+                    options =>
+                    {
+                        options.ResponseType = OpenIdConnectResponseType.Code;
+                        options.UsePkce = true;
+                        options.SaveTokens = true;
+                        options.MapInboundClaims = false;
+                        options.TokenValidationParameters.NameClaimType = JwtRegisteredClaimNames.Name;
+                        options.TokenValidationParameters.RoleClaimType = GameStoreClaimTypes.Roles;
+                        options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                        options.SignOutScheme = Schemes.Entra;
+                        options.CallbackPath = "/signin-entraid";
+                        options.SignedOutCallbackPath = "/authentication/signout-oidc";
+
+                        options.Events = new OpenIdConnectEvents
+                        {
+                            OnTokenValidated = context =>
+                            {
+                                var transformer = context.HttpContext
+                                                            .RequestServices
+                                                            .GetRequiredService<EntraClaimsTransformer>();
+                                transformer.Transform(context);
+
+                                return Task.CompletedTask;
+                            }
+                        };
+                    });
+
         if (builder.Environment.IsDevelopment())
         {
+            builder.Services.AddSingleton<KeycloakClaimsTransformer>();
+
             authBuilder.AddOpenIdConnect(
                 authenticationScheme: Schemes.Keycloak,
                 options =>
@@ -35,6 +64,18 @@ public static class AuthenticationExtensions
                     options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                     options.SignOutScheme = Schemes.Keycloak;
                     options.RequireHttpsMetadata = false;
+                    options.Events = new OpenIdConnectEvents
+                    {
+                        OnTokenValidated = context =>
+                        {
+                            var transformer = context.HttpContext
+                                                        .RequestServices
+                                                        .GetRequiredService<KeycloakClaimsTransformer>();
+                            transformer.Transform(context);
+
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
         }
 

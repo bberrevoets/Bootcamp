@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using GameStore.Api.Data;
 using GameStore.Api.Features.Games.Constants;
@@ -10,46 +10,59 @@ namespace GameStore.Api.Features.Games.UpdateGame;
 
 public static class UpdateGameEndpoint
 {
-    public static RouteHandlerBuilder MapUpdateGame(this IEndpointRouteBuilder app)
+    public static void MapUpdateGame(this IEndpointRouteBuilder app)
     {
-        return app.MapPut("/{id:guid}",
-                async (Guid id, [FromForm] UpdateGameDto updatedGame, GameStoreContext dbContext,
-                    FileUploader fileUploader, ClaimsPrincipal user) =>
+        // PUT /games/122233-434d-43434....
+        app.MapPut("/{id}", async (
+            Guid id,
+            [FromForm] UpdateGameDto gameDto,
+            GameStoreContext dbContext,
+            FileUploader fileUploader,
+            ClaimsPrincipal user) =>
+        {
+            var currentUserId = user?.FindFirstValue(JwtRegisteredClaimNames.Email)
+                                ?? user?.FindFirstValue(JwtRegisteredClaimNames.Sub);
+
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Results.Unauthorized();
+            }
+
+            var existingGame = await dbContext.Games.FindAsync(id);
+
+            if (existingGame is null)
+            {
+                return Results.NotFound();
+            }
+
+            if (gameDto.ImageFile is not null)
+            {
+                var fileUploadResult = await fileUploader.UploadFileAsync(
+                    gameDto.ImageFile,
+                    StorageNames.GameImagesFolder
+                );
+
+                if (!fileUploadResult.IsSucess)
                 {
-                    if (user.Identity?.IsAuthenticated == false)
-                        return Results.Unauthorized();
+                    return Results.BadRequest(new { message = fileUploadResult.ErrorMessage });
+                }
 
-                    var currentUserId = user?.FindFirstValue(JwtRegisteredClaimNames.Email)
-                                        ?? user?.FindFirstValue(JwtRegisteredClaimNames.Sub);
+                existingGame.ImageUri = fileUploadResult.FileUrl!;
+            }
 
-                    if (string.IsNullOrEmpty(currentUserId)) return Results.Unauthorized();
-                    var existingGame = await dbContext.Games.FindAsync(id);
+            existingGame.Name = gameDto.Name;
+            existingGame.GenreId = gameDto.GenreId;
+            existingGame.Price = gameDto.Price;
+            existingGame.ReleaseDate = gameDto.ReleaseDate;
+            existingGame.Description = gameDto.Description;
+            existingGame.LastUpdatedBy = currentUserId;
 
-                    if (existingGame is null) return Results.NotFound();
+            await dbContext.SaveChangesAsync();
 
-                    if (updatedGame.ImageFile is not null)
-                    {
-                        var fileUploadResult =
-                            await fileUploader.UploadFileAsync(updatedGame.ImageFile, StorageNames.GameImagesFolder);
-
-                        if (!fileUploadResult.IsSuccess) return Results.BadRequest(fileUploadResult.ErrorMessage);
-                        existingGame.ImageUri = fileUploadResult.FileUrl!;
-                    }
-
-                    existingGame.Name = updatedGame.Name;
-                    existingGame.GenreId = updatedGame.GenreId;
-                    existingGame.Price = updatedGame.Price;
-                    existingGame.ReleaseDate = updatedGame.ReleaseDate;
-                    existingGame.Description = updatedGame.Description;
-                    existingGame.LastUpdatedBy = currentUserId;
-
-                    await dbContext.SaveChangesAsync();
-
-                    return Results.NoContent();
-                })
-            .WithParameterValidation()
-            .DisableAntiforgery()
-            .RequireAuthorization(Policies.AdminAccess);
-        ;
+            return Results.NoContent();
+        })
+        .WithParameterValidation()
+        .DisableAntiforgery()
+        .RequireAuthorization(Policies.AdminAccess);
     }
 }

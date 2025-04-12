@@ -1,4 +1,7 @@
-﻿using GameStore.Api.Features.Genres.GetGenres;
+using System;
+using GameStore.Api.Data;
+using GameStore.Api.Features.Genres.GetGenres;
+using GameStore.Api.Models;
 
 namespace GameStore.Api.Features.Genres;
 

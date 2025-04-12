@@ -167,6 +167,6 @@
     {
         var authenticationState = await authenticationStateProvider.GetAuthenticationStateAsync();
 
-        return authenticationState?.User?.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        return authenticationState?.User?.FindFirst(GameStoreClaimTypes.UserId)?.Value;
     }    
 }

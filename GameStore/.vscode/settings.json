@@ -1,0 +1,5 @@
+{
+    "postman.settings.dotenv-detection-notification-visibility": false,
+    "appService.defaultWebAppToDeploy": "/subscriptions/af28c1ab-cd12-40de-a42f-43276b6e46cd/resourceGroups/rg-gamestore-dev-west-europe-001/providers/Microsoft.Web/sites/app-gamestore-be-dev-west-europe-001",
+    "appService.deploySubpath": "published-api"
+}

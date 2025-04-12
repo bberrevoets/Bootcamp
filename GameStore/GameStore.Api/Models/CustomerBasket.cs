@@ -1,4 +1,4 @@
-﻿namespace GameStore.Api.Models;
+namespace GameStore.Api.Models;
 
 public class CustomerBasket
 {

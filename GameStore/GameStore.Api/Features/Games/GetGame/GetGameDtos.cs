@@ -1,4 +1,4 @@
-﻿namespace GameStore.Api.Features.Games.GetGame;
+namespace GameStore.Api.Features.Games.GetGame;
 
 public record GameDetailsDto(
     Guid Id,

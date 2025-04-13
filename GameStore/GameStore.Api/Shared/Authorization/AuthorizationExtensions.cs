@@ -9,32 +9,56 @@ public static class AuthorizationExtensions
     public static IHostApplicationBuilder AddGameStoreAuthentication(
         this IHostApplicationBuilder builder)
     {
-        builder.Services.AddSingleton<KeycloakClaimsTransformer>();
+        var authBuilder = builder.Services.AddAuthentication(Schemes.Entra);
 
-        builder.Services.AddAuthentication(Schemes.Keycloak)
-                        .AddJwtBearer(options =>
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Services.AddSingleton<KeycloakClaimsTransformer>();
+            authBuilder.AddJwtBearer(options =>
+                {
+                    options.MapInboundClaims = false;
+                    options.TokenValidationParameters.RoleClaimType = GameStoreClaimTypes.Role;
+                })
+                .AddJwtBearer(Schemes.Keycloak, options =>
+                {
+                    options.MapInboundClaims = false;
+                    options.TokenValidationParameters.RoleClaimType = GameStoreClaimTypes.Role;
+                    options.RequireHttpsMetadata = false;
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnTokenValidated = context =>
                         {
-                            options.MapInboundClaims = false;
-                            options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-                        })
-                        .AddJwtBearer(Schemes.Keycloak, options =>
-                        {
-                            options.MapInboundClaims = false;
-                            options.TokenValidationParameters.RoleClaimType = ClaimTypes.Role;
-                            options.RequireHttpsMetadata = false;
-                            options.Events = new JwtBearerEvents
-                            {
-                                OnTokenValidated = context =>
-                                {
-                                    var transformer = context.HttpContext
-                                                             .RequestServices
-                                                             .GetRequiredService<KeycloakClaimsTransformer>();
-                                    transformer.Transform(context);
+                            var transformer = context.HttpContext
+                                .RequestServices
+                                .GetRequiredService<KeycloakClaimsTransformer>();
+                            transformer.Transform(context);
 
-                                    return Task.CompletedTask;
-                                }
-                            };
-                        });
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
+        }
+
+        builder.Services.AddSingleton<EntraClaimsTransformer>();
+
+        authBuilder.AddJwtBearer(Schemes.Entra, options =>
+        {
+            options.MapInboundClaims = false;
+            options.TokenValidationParameters.RoleClaimType = GameStoreClaimTypes.Roles;
+            options.Events = new JwtBearerEvents
+            {
+                OnTokenValidated = context =>
+                {
+                    var transformer = context.HttpContext
+                        .RequestServices
+                        .GetRequiredService<EntraClaimsTransformer>();
+                    transformer.Transform(context);
+
+                    return Task.CompletedTask;
+                }
+            };
+
+        });
 
         return builder;
     }
@@ -43,15 +67,13 @@ public static class AuthorizationExtensions
         this IHostApplicationBuilder builder)
     {
         builder.Services.AddAuthorizationBuilder()
-                        .AddFallbackPolicy(Policies.UserAccess, authBuilder =>
-                        {
-                            authBuilder.RequireClaim(ClaimTypes.Scope, ApiAccessScope);
-                        })
-                        .AddPolicy(Policies.AdminAccess, authBuilder =>
-                        {
-                            authBuilder.RequireClaim(ClaimTypes.Scope, ApiAccessScope);
-                            authBuilder.RequireRole(Roles.Admin);
-                        });
+            .AddFallbackPolicy(Policies.UserAccess,
+                authBuilder => { authBuilder.RequireClaim(GameStoreClaimTypes.Scope, ApiAccessScope); })
+            .AddPolicy(Policies.AdminAccess, authBuilder =>
+            {
+                authBuilder.RequireClaim(GameStoreClaimTypes.Scope, ApiAccessScope);
+                authBuilder.RequireRole(Roles.Admin);
+            });
 
         return builder;
     }

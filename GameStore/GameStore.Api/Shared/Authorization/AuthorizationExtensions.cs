@@ -1,4 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Net.Http.Headers;
 
 namespace GameStore.Api.Shared.Authorization;
 
@@ -9,7 +11,7 @@ public static class AuthorizationExtensions
     public static IHostApplicationBuilder AddGameStoreAuthentication(
         this IHostApplicationBuilder builder)
     {
-        var authBuilder = builder.Services.AddAuthentication(Schemes.Entra);
+        var authBuilder = builder.Services.AddAuthentication(Schemes.KeycloakOrEntra);
 
         if (builder.Environment.IsDevelopment())
         {
@@ -58,6 +60,28 @@ public static class AuthorizationExtensions
                 }
             };
 
+        });
+
+        authBuilder.AddPolicyScheme(Schemes.KeycloakOrEntra, Schemes.KeycloakOrEntra, options =>
+        {
+            options.ForwardDefaultSelector = context =>
+            {
+                string authorization = context.Request.Headers[HeaderNames.Authorization]!;
+
+                if (!string.IsNullOrEmpty(authorization) && authorization.StartsWith("Bearer "))
+                {
+                    var token = authorization["Bearer ".Length..].Trim();
+
+                    var jwtHandler = new JwtSecurityTokenHandler();
+
+                    return jwtHandler.CanReadToken(token) &&
+                           jwtHandler.ReadJwtToken(token).Issuer.Contains("ciamlogin.com")
+                        ? Schemes.Entra
+                        : Schemes.Keycloak;
+                }
+
+                return Schemes.Entra;
+            };
         });
 
         return builder;

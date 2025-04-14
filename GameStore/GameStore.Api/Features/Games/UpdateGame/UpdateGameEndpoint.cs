@@ -42,7 +42,7 @@ public static class UpdateGameEndpoint
                     StorageNames.GameImagesFolder
                 );
 
-                if (!fileUploadResult.IsSucess)
+                if (!fileUploadResult.IsSuccess)
                 {
                     return Results.BadRequest(new { message = fileUploadResult.ErrorMessage });
                 }

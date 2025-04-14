@@ -1,25 +1,26 @@
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+
 namespace GameStore.Api.Shared.FileUpload;
 
-public class FileUploader(
-    IWebHostEnvironment environment,
-    IHttpContextAccessor httpContextAccessor)
+public class FileUploader(BlobServiceClient blobServiceClient)
 {
     public async Task<FileUploadResult> UploadFileAsync(
-        IFormFile file,
+        IFormFile? file,
         string folder)
     {
         var result = new FileUploadResult();
 
         if (file == null || file.Length == 0)
         {
-            result.IsSucess = false;
+            result.IsSuccess = false;
             result.ErrorMessage = "No file uploaded";
             return result;
         }
 
         if (file.Length > 10 * 1024 * 1024)
         {
-            result.IsSucess = false;
+            result.IsSuccess = false;
             result.ErrorMessage = "File is too large.";
             return result;
         }
@@ -31,28 +32,24 @@ public class FileUploader(
             string.IsNullOrEmpty(fileExtension)
             || !permittedExtensions.Contains(fileExtension))
         {
-            result.IsSucess = false;
+            result.IsSuccess = false;
             result.ErrorMessage = "Invalid file type.";
             return result;
         }
 
-        var uploadFolder = Path.Combine(environment.WebRootPath, folder);
-        if (!Directory.Exists(uploadFolder))
-        {
-            Directory.CreateDirectory(uploadFolder);
-        }
+        var containerClient = blobServiceClient.GetBlobContainerClient(folder);
+        await containerClient.CreateIfNotExistsAsync(PublicAccessType.Blob);
 
         var safeFileName = $"{Guid.NewGuid()}{fileExtension}";
-        var fullPath = Path.Combine(uploadFolder, safeFileName);
 
-        using var stream = new FileStream(fullPath, FileMode.Create);
-        await file.CopyToAsync(stream);
+        var blobClient = containerClient.GetBlobClient(safeFileName);
+        await blobClient.DeleteIfExistsAsync();
 
-        var httpContext = httpContextAccessor.HttpContext;
-        var fileUrl = $"{httpContext?.Request.Scheme}://{httpContext?.Request.Host}/{folder}/{safeFileName}";
+        await using var fileStream = file.OpenReadStream();
+        await blobClient.UploadAsync(fileStream, new BlobHttpHeaders { ContentType = file.ContentType });
 
-        result.IsSucess = true;
-        result.FileUrl = fileUrl;
+        result.IsSuccess = true;
+        result.FileUrl = blobClient.Uri.ToString();
         return result;
     }
 }

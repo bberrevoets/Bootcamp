@@ -18,8 +18,4 @@
 		<PackageReference Include="MinimalApis.Extensions" Version="0.11.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.1" />
 	</ItemGroup>
-
-	<ItemGroup>
-		<Content Remove="wwwroot/**" />
-	</ItemGroup>
 </Project>

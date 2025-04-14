@@ -22,7 +22,7 @@ public class RequestTimingMiddleware(
 
             var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
             logger.LogInformation(
-                "{Requestmethod} {RequestPath} completed with status {Status} in {ElapsedMilliseconds}ms",
+                "{RequestMethod} {RequestPath} completed with status {Status} in {ElapsedMilliseconds}ms",
                 context.Request.Method,
                 context.Request.Path,
                 context.Response.StatusCode,

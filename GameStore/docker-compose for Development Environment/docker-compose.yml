@@ -28,6 +28,15 @@ services:
         - keycloak-GameStore-data:/opt/keycloak/data
     command: ["start-dev"]
 
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest #3.34.0
+    container_name: azurite_GameStore
+    ports:
+        - "10000:10000"
+    volumes:
+        - azurite-GameStore-data:/data
+
 volumes:
   smtp4dev-GameStore-data:
   keycloak-GameStore-data:  
+  azurite-GameStore-data:
